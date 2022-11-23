@@ -22,17 +22,17 @@ function Login() {
     });
   }
 
-  axios({
-    method: "get",
-    url: "localhost:3000"
-  })
-
   function onClickSubmitHandler(e) {
     e.preventDefault();
     setUserState({ userId: inputs.id, userPassword: inputs.pw});
-    if (isLogined){
-      axios.get('/user');
-    return;
+    if (!isLogined){
+      try {
+        const response = axios.get("http://18.181.177.179:3000/user")
+        console.log(userState);
+        console.log(response);
+      } catch (error) {
+        console.error(error);
+      }
     }
   }
 

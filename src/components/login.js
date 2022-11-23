@@ -2,71 +2,66 @@ import { useEffect, useState } from "react";
 import { useRecoilState } from "recoil";
 import { userRecoilState } from "../recoil/userState";
 import "./login.css";
+import axios from "axios";
 
 function Login() {
-  const setUserName = useRecoilState(userRecoilState);
-  const [input, setInput] = useState("");
-  const [state, setState] = useState({
-    isLogined: false,
-    userName: ""
+  const [userState, setUserState] = useRecoilState(userRecoilState);
+  const [inputs, setInputs] = useState({
+    id: "",
+    pw: "",
   });
-  const loginText = state.isLogined ? "LOGOUT" : "LOGIN";
+  const [isLogined, setState] = useState(false);
+  const loginText = isLogined ? "LOGOUT" : "LOGIN";
+  const { id, pw } = inputs;
 
   function onChangeInputHandler(e) {
-    const text = e.target.value;
-    setInput(text);
-  }
-
-  function onClickSubmitHandler(e) {
-    e.preventDefault();
-    if (!state.isLogined){
-      setState({
-        userName: input,
-        isLogined: true,
-      });
-      setUserName(input);
-      return;
-    }
-    setState({
-      isLogined: false,
-      userName: ""
+    const { name, value } = e.target;
+    setInputs({
+      ...inputs,
+      [name]: value
     });
   }
 
-  const inputId = <input type="text" onChange={onChangeInputHandler}/>;
-  const inputPw = <input type="text" onChange={onChangeInputHandler}/>;
+  axios({
+    method: "get",
+    url: "localhost:3000"
+  })
+
+  function onClickSubmitHandler(e) {
+    e.preventDefault();
+    setUserState({ userId: inputs.id, userPassword: inputs.pw});
+    if (isLogined){
+      axios.get('/user');
+    return;
+    }
+  }
 
   return (
-    <div>
+    <>
     <div className="container">
-        <div className="logo"></div>
+        <img className="logo"></img>
     </div>
     <div className="container">
         <div className="login-box">
-        
-            <div className="idpw">
-                <form>
-                    <p>ID </p>{inputId}
-                    <br />
-                </form>
-                <form>
-                    <p>PW </p>{inputPw}
-                </form>
-            </div>
-        
-            <button 
-                type="button" 
-                onClick={onClickSubmitHandler}>
-                {loginText}
-            </button>
-            <a href="/signUp">회원가입</a>
+          <div className="idpw">
+            <p>ID </p>
+            <input name='id' onChange={onChangeInputHandler} value={id}/>
             <br />
-            <a href="/main">아이디/비밀번호 찾기</a>
-
-        {/* <CommentsForm isLogined={state.isLogined} userName={state.userName}/> */}
-            </div>
+          </div>
+          <div className="idpw">
+            <p>PW </p>
+            <input name='pw' onChange={onChangeInputHandler} value={pw}/>
+            <br />
+          </div>
+          <button type="button" onClick={onClickSubmitHandler}>
+          {loginText}
+          </button>
+          <br />
+          <a href="/signup">회원가입</a>
+          <a href="/idpwfind">아이디/비밀번호 찾기</a>
         </div>
-    </div>
+      </div>
+    </>
   )
 }
 
